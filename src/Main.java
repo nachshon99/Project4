@@ -24,9 +24,9 @@ public class Main {
         Address[]addresses = {address1,address2,address3,address4,address5,address6,address7,address8,address9,address10,address11};
 
         Property property = new Property(address1, 4,1350000, "private", false, 8,10,user);
-        Property property1 = new Property(address2, 5,1500000, "private", true, 5,5,user);
+        Property property1 = new Property(address2, 5,1500000, "regular", true, 5,5,user);
         Property property2 = new Property(address1, 4,1350000, "private", false, 1,1,user);
-        Property property3 = new Property(address1, 3,1350000, "private", false, 2,1,user);
+        Property property3 = new Property(address1, 3,1350000, "penthouse", false, 2,1,user);
         Property property4 = new Property(address1, 4,1350000, "private", false, 6,1,user);
         Property property5 = new Property(address1, 2,350000, "private", true, 2,1,user);
         Property property6 = new Property(address1, 4,900000, "private", false, 2,1,user);

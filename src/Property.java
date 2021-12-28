@@ -7,6 +7,7 @@ public class Property {
     private int numberOfHome;
     private int numberOfFloor;
     private User user;
+    public static final String PRIVATE = "private";
 
     public Property(Address address, int countOfRoom, int price, String type, boolean isForRent
                     , int numberOfHome , int numberOfFloor, User user){
@@ -85,15 +86,16 @@ public class Property {
     }
 
     public String toString() {
-        return "Property: " + "\n" +
-                "address: " + address + "\n" +
-                "countOfRoom: " + countOfRoom + "\n" +
-                "price: " + price + "\n" +
-                "type: " + type + "\n" +
-                "isForRent: " + isForRent + "\n" +
-                "numberOfHome: " + numberOfHome + "\n" +
-                "numberOfFloor: " + numberOfFloor + "\n" +
-                "user: " + user +"\n";
+        String output  = "Property: " + "\n" +
+                "Type: " + type + "\n" +
+                "Is for rent: " + isForRent + "\n" +
+                "Count Of room: " + countOfRoom + "\n";
+        if(!type.equals(PRIVATE)){
+            output += "numberOfFloor: " + numberOfFloor + "\n";
+        }
+        output += "price: " + price + "\n";
+        return output;
+
     }
 
 }
