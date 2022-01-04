@@ -12,31 +12,53 @@ public class RealEstate {
     public static final char ZERO_CHAR = '0';
     public static final char FIVE_CHAR = '5';
     public static final int SKIP_OPTION = -999;
-    public static final String REGULAR = "regular";
-    public static final String PENTHOUSE = "penthouse";
-    public static final String PRIVATE = "private";
+    public static final String REGULAR = "Regular apartment";
+    public static final String PENTHOUSE = "Penthouse apartment";
+    public static final String PRIVATE = "Private apartment";
+    public static final int REGULAR_FLOOR_APARTMENT = 1;
+    public static final int PENTHOUSE_FLOOR_APARTMENT = 2;
+    public static final int PRIVATE_HOME = 3;
+    public static final String NULL = null;
+    public static final int ADD_TO_LENGTH_ARRAY = 1;
+    public static final int ONE = 1;
 
-
-    public RealEstate(User[]users, Property[]properties,Address[]addresses){
-        this.users = users;
-        this.properties = properties;
-        this.addresses = addresses;
+    public RealEstate(){
+        this.users = new User[INITIALIZE];
+        this.properties = new Property[INITIALIZE];
+        Address address1 = new Address("Ashkelon", "Emek Heffer");
+        Address address2 = new Address("Ashdod", "adsd");
+        Address address3 = new Address("Ashdod", "adsdass");
+        Address address4 = new Address("Tel Aviv", "adsdass");
+        Address address5 = new Address("Ashdod", "adsdass");
+        Address address6 = new Address("Ashdod", "adsdass");
+        Address address7 = new Address("Netivot", "adsdass");
+        Address address8 = new Address("Ashdod", "adsdass");
+        Address address9 = new Address("Netivot", "adsdass");
+        Address address10 = new Address("Eilat", "adsdass");
+        Address[] addresses1 = {address1, address2, address3, address4, address5, address6, address7, address8, address9, address10};
+        this.addresses = addresses1;
     }
 
     public void createUser(){
         Scanner scanner = new Scanner(System.in);
         boolean isIntermediary;
 
-        String userName = null;
+        String userName = NULL;
+
         do {
             System.out.println("Enter UserName: ");
             userName = scanner.nextLine();
-            if(isUserNameExist(userName)){
-                System.out.println("The userName is busy!");
+            if(users.length != INITIALIZE) {
+                if (isUserNameExist(userName)) {
+                    System.out.println("The userName is busy!");
+                }
+            }else {
+                break;
             }
-        }while (isUserNameExist(userName) || userName.length() == 0);
+        }while (isUserNameExist(userName) || userName.length() == INITIALIZE);
 
-        String password = null;
+
+        String password = NULL;
         do {
             System.out.println("Enter password: ");
             password = scanner.nextLine();
@@ -45,7 +67,7 @@ public class RealEstate {
             }
         }while (!isStrongPassword(password));
 
-        String phoneNumber = null;
+        String phoneNumber = NULL;
         do {
             System.out.println("Enter phone number: ");
             phoneNumber = scanner.nextLine();
@@ -58,11 +80,11 @@ public class RealEstate {
         do {
             System.out.println("Are you an intermediary? (press 1 for true, press 0 for false)");
             intermediary = scanner.nextInt();
-            if(intermediary != 1 && intermediary != 0){
+            if(intermediary != ONE && intermediary != INITIALIZE){
                 System.out.println("The answer is not valid");
             }
-        }while (intermediary != 1 && intermediary != 0);
-        if(intermediary == 1){
+        }while (intermediary != ONE && intermediary != INITIALIZE);
+        if(intermediary == ONE){
             isIntermediary = true;
         }else {
             isIntermediary = false;
@@ -71,7 +93,7 @@ public class RealEstate {
     }
 
     private  void addUserToArray(String userName, String password,String phoneNumber, boolean isIntermediary){
-        User[] newArray = new User[this.users.length + 1];
+        User[] newArray = new User[this.users.length + ADD_TO_LENGTH_ARRAY];
         for (int i = 0; i < this.users.length;i++){
             newArray[i] = this.users[i];
         }
@@ -84,17 +106,19 @@ public class RealEstate {
         Scanner scanner = new Scanner(System.in);
         boolean isExistUser = false;
 
-        int saveIndex = 0;
+        int saveIndex = INITIALIZE;
         System.out.println("Enter userName: ");
         String userName = scanner.nextLine();
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
         for (int i = 0; i < users.length;i++){
-            if(users[i].getUserName().equals(userName)){
-                if(users[i].getPassword().equals(password)){
-                    isExistUser = true;
-                    saveIndex = i;
-                    break;
+            if(users[i] != null) {
+                if (users[i].getUserName().equals(userName)) {
+                    if (users[i].getPassword().equals(password)) {
+                        isExistUser = true;
+                        saveIndex = i;
+                        break;
+                    }
                 }
             }
         }
@@ -108,34 +132,110 @@ public class RealEstate {
     public boolean postNewProperty(User user){
         Scanner scanner = new Scanner(System.in);
         boolean canPost = false;
+        boolean canPostMediator = false;
+        boolean canPostNotMediator = false;
         int countOfProperties = INITIALIZE;
+        String[] streets = new String[this.addresses.length];
         if(user.isMediator()){
             if(countOfPropertiesPossible(user,countOfProperties) < LIMIT_OF_PROPERTIES_Intermediary ){
-                canPost = true;
-                String[] listCitiesOfUser = printCities(returnArrOfAddressesOfUser(user,this.properties));
-                String getAddress = scanner.nextLine();
-                for (int i = 0; i < listCitiesOfUser.length;i++){
-                    if(listCitiesOfUser[i].equals(getAddress)){
-                        System.out.println("----");
-                    }
-                }
-
-            }
-            else {
-                System.out.println("You have reached the limit!");
+                canPostMediator = true;
+            }else {
+                canPostMediator = false;
             }
         }else {
             if (countOfPropertiesPossible(user, countOfProperties) < LIMIT_OF_PROPERTIES_ORIGIN) {
-                canPost = true;
-                printCities(returnArrOfAddressesOfUser(user,properties));
+                canPostNotMediator = true;
+            }else {
+                canPostMediator = false;
             }
-            else {
-                System.out.println("You have reached the limit!");
+        }
+        if(canPostMediator || canPostNotMediator){
+            String[] listCities = printCities(returnArrOfCities(this.addresses));
+            System.out.println("Enter name of city from the list: ");
+            String getCity = scanner.nextLine();
+            for (int i = 0; i < listCities.length;i++){
+                if(listCities[i].equals(getCity)){
+                    for (int j = 0, k = 0; j < this.addresses.length;j++){
+                        if(this.addresses[j].getNameOfCity().equals(getCity)){
+                            streets[k] = this.addresses[j].getNameOfStreet();
+                            k++;
+                            canPost = true;
+                        }
+                    }
+                    printArray(streets);
+                    System.out.println("Enter street from list: ");
+                    String getStreet = scanner.nextLine();
+                    for (int j = 0; j < streets.length;j++){
+                        if(streets[j] != null) {
+                            if (streets[j].equals(getStreet)) {
+                                canPost = true;
+                                break;
+                            } else {
+                                canPost = false;
+                            }
+                        }
+                    }
+                    if(canPost){
+                        System.out.println("Choose type property: " + "\n"
+                                + "Press 1 - for regular floor apartment " + "\n"
+                                + "Press 2 - for penthouse floor apartment" + "\n"
+                                + "Press 3 - for private home");
+                        int getTypeInt = scanner.nextInt();
+                        int getFloor = INITIALIZE;
+                        switch (getTypeInt){
+                            case REGULAR_FLOOR_APARTMENT :
+                            case PENTHOUSE_FLOOR_APARTMENT:{
+                                System.out.println("Enter floor: ");
+                                getFloor = scanner.nextInt();
+                                break;
+                            }
+                            case PRIVATE_HOME:{
+                                break;
+                            }
+                        }
+                        String getTypeString = NULL;
+                        if(getTypeInt == REGULAR_FLOOR_APARTMENT){
+                            getTypeString = REGULAR;
+                        }else if(getTypeInt == PENTHOUSE_FLOOR_APARTMENT){
+                            getTypeString = PENTHOUSE;
+                        }else if(getTypeInt == PRIVATE_HOME){
+                            getTypeString = PRIVATE;
+                        }
+                        System.out.println("Enter how many rooms: ");
+                        int getRooms = scanner.nextInt();
+                        System.out.println("Enter number of home: ");
+                        int getNumHome = scanner.nextInt();
+                        System.out.println("Is for rent? (true / false)");
+                        boolean getRent = scanner.nextBoolean();
+                        System.out.println("Enter a price: ");
+                        int getPrice = scanner.nextInt();
+                        Address getAddress = new Address(getCity,getStreet);
+                        Property newProperty = new Property(getAddress,getRooms,getPrice,getTypeString,getRent,getNumHome,getFloor,user);
+                        Property[] newProperties = new Property[properties.length + ONE];
+                        for (int k = 0; k < this.properties.length;k++){
+                            newProperties[k] = this.properties[k];
+                        }
+                        newProperties[newProperties.length - ONE] = newProperty;
+                        this.properties = newProperties;
+                        canPost = true;
+                        break;
+                    }
+
+
+                }else {
+                    canPost = false;
+                }
             }
+            if(!canPost) {
+                System.out.println("The city is not show in the list!");
+            }
+        }
+        else {
+            System.out.println("You have reached the limit!");
         }
 
         return canPost;
-    } //post new property
+    }
 
     public void removeProperty(User user){
         Scanner scanner = new Scanner(System.in);
@@ -145,107 +245,143 @@ public class RealEstate {
             System.out.println("No exist properties");
         }else {
             for (int i = 0; i < properties.length;i++){
-                if(properties[i].getUser().getUserName().equals(user.getUserName())){
-                    System.out.println("Press " + i +"- to remove: " + "\n" + properties[i].toString());
-                    arrayOfIndexes[indexToArray] = i;
-                    indexToArray++;
-                }
+                    if(properties[i].getUser().getUserName().equals(user.getUserName())){
+                        System.out.println("Press " + i +"- to remove: " + "\n" + properties[i].toString());
+                        arrayOfIndexes[indexToArray] = i;
+                        indexToArray++;
+                    }
             }
             int option;
             do {
                 System.out.println("Choose which property you want to remove: ");
                 option = scanner.nextInt();
             }while(!isExistIndex(arrayOfIndexes, option));
+            for (int i = 0; i < this.properties.length;i++){
+                this.properties[option] = this.properties[this.properties.length - ONE];
+                Property[] newProperty = new Property[this.properties.length - ONE];
+                if (newProperty.length != INITIALIZE) {
+                    for (int j = 0; j < this.properties.length; j++) {
+                        newProperty[j] = this.properties[j];
+                    }
+                }
+                this.properties = newProperty;
 
+            }
         }
     }
 
     public void printAllProperties(){
-        for (int i = 0; i < properties.length;i++){
-            System.out.println(properties[i]);
+        if(properties.length != INITIALIZE) {
+            for (int i = 0; i < properties.length; i++) {
+                    System.out.println(properties[i]);
+            }
+        }else {
+            System.out.println("No exist properties");
         }
     }
 
     public void printAllProperties(User user){
-        for (int i = 0; i < properties.length;i++){
-            if(properties[i].getUser().getUserName().equals(user.getUserName())){
-                System.out.println(properties[i]);
+        if(properties.length != INITIALIZE) {
+            for (int i = 0; i < properties.length;i++){
+                if(properties[i].getUser().getUserName().equals(user.getUserName())){
+                    System.out.println(properties[i]);
+                }
             }
+        }else {
+            System.out.println("No exist properties");
         }
     }
 
     public Property[]search(){
         Scanner scanner= new Scanner(System.in);
-        Property[] newProperty = new Property[properties.length];
-        int indexOfNewProperty = INITIALIZE;
-        boolean forRent;
-        int forRentOrSale;
-        do {
-            System.out.println("Is the apartment for rent? (1 - for rent, 2 - for sale)");
-            forRentOrSale = scanner.nextInt();
-            if(forRentOrSale == SKIP_OPTION){
-                break;
+        if(properties.length != 0) {
+            Property[] newProperty = new Property[properties.length];
+            int indexOfNewProperty = INITIALIZE;
+            boolean is999Rent = false, is999Type = false, is999Rooms = false, is999MinPrice = false, is999MaxPrice = false;
+            boolean forRent;
+            int forRentOrSale;
+            do {
+                System.out.println("Is the apartment for rent? (Press 1 - for rent, Press 2 - for sale, Press -999 to not filter option)");
+                forRentOrSale = scanner.nextInt();
+                if (forRentOrSale == SKIP_OPTION) {
+                    is999Rent = true;
+                    break;
+                }
+            } while (forRentOrSale < 1 || forRentOrSale > 2);
+            if (forRentOrSale == 1) {
+                forRent = true;
+            } else {
+                forRent = false;
             }
-        }while (forRentOrSale < 1 || forRentOrSale > 2);
-        if(forRentOrSale == 1){
-            forRent = true;
+
+            int type;
+            String stringType = null;
+            do {
+                System.out.println("What type of property? \n" +
+                        "(Press 1 - for regular floor apartment" + "\n"
+                        + "Press 2 - for penthouse floor apartment" + "\n"
+                        + "Press 3 - for private home" + "\n"
+                        + "Press -999 - to not filter this option)");
+                type = scanner.nextInt();
+                if (type == SKIP_OPTION) {
+                    is999Type = true;
+                    break;
+                }
+            } while (type < 1 || type > 3);
+            if (type == 1) {
+                stringType = REGULAR;
+            } else if (type == 2) {
+                stringType = PENTHOUSE;
+            } else if (type == 3) {
+                stringType = PRIVATE;
+            }
+
+            int rooms;
+            do {
+                System.out.println("How many rooms do you want? (Press -999 - to not filter this option)");
+                rooms = scanner.nextInt();
+                if (rooms == SKIP_OPTION) {
+                    is999Rooms = true;
+                    break;
+                }
+            } while (rooms < 0);
+
+            int minPrice;
+            do {
+                System.out.println("What minimum price do you want? (Press -999 - to not filter this option)");
+                minPrice = scanner.nextInt();
+                if (minPrice == SKIP_OPTION) {
+                    is999MinPrice = true;
+                    break;
+                }
+            } while (minPrice < 0);
+            int maxPrice;
+            do {
+                System.out.println("What maximum price do you want? (Press -999 - to not filter this option)");
+                maxPrice = scanner.nextInt();
+                if (maxPrice == SKIP_OPTION) {
+                    is999MaxPrice = true;
+                    break;
+                }
+            } while (maxPrice < minPrice);
+            for (int i = 0; i < properties.length; i++) {
+                if ((this.properties[i].isForRent() == forRent && !is999Rent) && (this.properties[i].getType().equals(stringType) && !is999Type) && (this.properties[i].getCountOfRoom() == rooms && !is999Rooms) && (this.properties[i].getPrice() > minPrice && !is999MinPrice) && (this.properties[i].getPrice() < maxPrice && !is999MaxPrice)) {
+                    newProperty[indexOfNewProperty] = this.properties[i];
+                    indexOfNewProperty++;
+                }
+            }
+            return newProperty;
         }else {
-            forRent = false;
+            System.out.println("No exist properties");
+            return null;
         }
+    }
 
-        int type;
-        String stringType = null;
-        do {
-            System.out.println("What type of property? \n" +
-                    "(Press 1 - for regular floor apartment" + "\n"
-                    + "Press 2 - for penthouse floor apartment" + "\n"
-                    + "Press 3 - for private home" + "\n"
-                    + "Press -999 - to not filter this option)");
-            type = scanner.nextInt();
-            if(type == SKIP_OPTION){
-                break;
-            }
-        }while (type < 1 || type > 3);
-        if(type == 1){
-            stringType = REGULAR;
-        }else if (type == 2){
-            stringType = PENTHOUSE;
-        }else if(type == 3){
-            stringType = PRIVATE;
+    private void printArray(String[] strings){
+        for (int i = 0; i < strings.length;i++){
+            if(strings[i] != null)
+            System.out.println(strings[i]);
         }
-
-        int rooms;
-        do {
-            System.out.println("How many rooms do you want? (Press -999 - to not filter this option)");
-            rooms = scanner.nextInt();
-            if(rooms == SKIP_OPTION){
-                break;
-            }
-        }while (rooms < 0);
-
-        int minPrice;
-        do {
-            System.out.println("What minimum price do you want? (Press -999 - to not filter this option)");
-            minPrice = scanner.nextInt();
-            if(minPrice == SKIP_OPTION){
-                break;
-            }
-        }while (minPrice < 0);
-        int maxPrice;
-        do {
-            System.out.println("What maximum price do you want? (Press -999 - to not filter this option)");
-            maxPrice = scanner.nextInt();
-            if(maxPrice == SKIP_OPTION){
-                break;
-            }
-        }while (maxPrice < minPrice);
-        for (int i = 0; i < properties.length;i++){
-            //******************
-            //להמשיך
-
-
-        }
-        return newProperty;
     }
 
     private  boolean isExistUser(User user){
@@ -272,8 +408,10 @@ public class RealEstate {
 
     private int countOfPropertiesPossible(User user, int countOfProperties){
         for (int i = 0; i < properties.length;i++){
-            if(properties[i].getUser().getUserName().equals(user.getUserName())){
-                countOfProperties++;
+            if(properties[i] != null) {
+                if (properties[i].getUser().getUserName().equals(user.getUserName())) {
+                    countOfProperties++;
+                }
             }
         }
         return countOfProperties;
@@ -319,7 +457,7 @@ public class RealEstate {
         return strongPassword;
     }
 
-    public  boolean isValidNumber(String phoneNumber){
+    private boolean isValidNumber(String phoneNumber){
         boolean valid = false;
         if(phoneNumber.length() == LENGTH_DIGITS_OF_PHONE_NUMBER){
             if(phoneNumber.charAt(0) == ZERO_CHAR && phoneNumber.charAt(1) == FIVE_CHAR){
@@ -336,52 +474,58 @@ public class RealEstate {
         return valid;
     }
 
-    private  String[] printCities(Address[] addresses){
-        String[] newAddresses = new String[addresses.length];
+    private  String[] printCities(String[] cities){
+        String[] newCities = new String[cities.length];
         int indexToArray = INITIALIZE;
         System.out.println("The list of your cities are: ");
-        for (int i = 0; i < addresses.length; i++){
-            if (!isExistInArray(newAddresses,addresses[i])) {
-                newAddresses[indexToArray] = addresses[i].getNameOfCity();
-                System.out.println(newAddresses[indexToArray]);
+        for (int i = 0; i < cities.length; i++){
+            if (!isExistInArray(newCities,cities[i])) {
+                newCities[indexToArray] = cities[i];
+                System.out.println(newCities[indexToArray]);
                 indexToArray++;
             }
         }
-        String[] listCitiesOfUser = new String[indexToArray-1];
+        String[] listCities = new String[indexToArray];
         indexToArray = INITIALIZE;
-        for (int i = 0; i < newAddresses.length;i++){
-            if(newAddresses[i] != null){
-                listCitiesOfUser[indexToArray] = newAddresses[i];
+        for (int i = 0; i < newCities.length;i++){
+            if(newCities[i] != null){
+                listCities[indexToArray] = newCities[i];
                 indexToArray++;
             }else {
                 break;
             }
         }
-        return listCitiesOfUser;
+        return listCities;
     }
 
-    private  Address[] returnArrOfAddressesOfUser(User user, Property[] properties){
-        Address[]addresses1 = new Address[properties.length];
+    private  String[] returnArrOfCities(Address[] addresses){
+        String[]cities = new String[addresses.length];
         int indexToArray = INITIALIZE;
-        for (int i = 0; i < properties.length;i++){
-            if(properties[i].getUser().equals(user)){
-                addresses1[indexToArray] = properties[i].getAddress();
+        int lengthNewArray = INITIALIZE;
+        for (int i = 0; i < addresses.length;i++){
+            if(addresses[i] != null) {
+                cities[indexToArray] = addresses[i].getNameOfCity();
+                indexToArray++;
+                lengthNewArray++;
             }
         }
-        return addresses1;
+        String[] citiesToReturn = new String[lengthNewArray];
+        for (int i = 0; i < cities.length;i++){
+            if(cities[i] != null){
+                citiesToReturn[i] = cities[i];
+            }
+        }
+        return citiesToReturn;
     }
 
-    private  boolean isExistInArray(String[] addresses, Address address){
+    private  boolean isExistInArray(String[] cities, String city){
         boolean exist = false;
-        for (int i = 0; i < addresses.length;i++){
-            if(addresses[i] == null){
+        for (int i = 0, k = 0; i < cities.length;i++){
+            if(cities[i] == null){
                 break;
-            }
-            else if(addresses[i].equals(address.getNameOfCity())){
+            }else if(cities[i].equals(city)){
                 exist = true;
                 break;
-            }else {
-                exist = false;
             }
         }
         return exist;
@@ -413,8 +557,8 @@ public class RealEstate {
 
     public String toString() {
         return "RealEstate:" + "\n" +
-                "users: " + "\n" + Arrays.toString(users) + "\n" +
-                "properties=" + Arrays.toString(properties) + "\n" +
-                "addresses=" + Arrays.toString(addresses) +"\n";
+                "users: \n" + Arrays.toString(users) + "\n" +
+                "properties: \n" + Arrays.toString(properties) + "\n" +
+                "addresses: \n" + Arrays.toString(addresses) +"\n";
     }
 }

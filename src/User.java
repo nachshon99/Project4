@@ -45,10 +45,12 @@ public class User {
     }
 
     public String toString() {
-        return "User:" + "\n" +
-                "userName: " + userName + "\n" +
-                "password: " + password + "\n" +
-                "phoneNumber: " + phoneNumber + "\n" +
-                "isMediator: " + isMediator +"\n";
+        String output = this.userName + " " +  this.phoneNumber;
+        if(this.isMediator){
+            output += "(real estate broker)";
+        }else {
+            output += ("(private person)");
+        }
+        return output;
     }
 }
