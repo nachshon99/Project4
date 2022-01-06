@@ -2,37 +2,17 @@ import java.util.Scanner;
 
 public class Main {
     public static final int INITIALIZE = 0;
+    public static final int CREATE_ACCOUNT = 1;
+    public static final int CONNECT_TO_ACCOUNT = 2;
+    public static final int EXIT = 3;
+    public static final int POST_NEW_PROPERTY = 1;
+    public static final int REMOVE_PROPERTY = 2;
+    public static final int PRINT_ALL_PROPERTIES = 3;
+    public static final int PRINT_ALL_PROPERTIES_OF_USER = 4;
+    public static final int SEARCH = 5;
+    public static final int BACK = 6;
 
     public static void main(String[] args) {
-        /*User user = new User("Nachshon99", "a123$", "0541234567", true);
-        User user1 = new User("nachshon", "a1$", "0545492958", false);
-
-*/
-        /*Address address1 = new Address("Ashkelon", "Emek Heffer");
-        Address address2 = new Address("Ashdod", "Keren Hayesod");
-        Address address3 = new Address("Ashdod", "Herzel");
-        Address address4 = new Address("Tel Aviv", "Hashlom");
-        Address address5 = new Address("Ashdod", "Bnei Brit");
-        Address address6 = new Address("Ashdod", "adsdass");
-        Address address7 = new Address("Netivot", "adsdass");
-        Address address8 = new Address("Ashdod", "adsdass");
-        Address address9 = new Address("Netivot", "adsdass");
-        Address address10 = new Address("Eilat", "adsdass");
-
-        Address[]addresses = {address1,address2,address3,address4,address5,address6,address7,address8,address9,address10};
-*/
-       /* Property property = new Property(address1, 4,1350000, "Private apartment", true, 8,10,user);
-        Property property1 = new Property(address2, 5,1500000, "Regular apartment", true, 5,5,user);
-        Property property2 = new Property(address3, 4,1350000, "Private apartment", true, 1,1,user);
-        Property property3 = new Property(address4, 3,1350000, "Penthouse apartment", true, 2,1,user);
-        Property property4 = new Property(address5, 4,1350000, "Private apartment", false, 6,1,user1);
-        Property property5 = new Property(address6, 2,350000, "Private apartment", true, 2,1,user);
-        Property property6 = new Property(address7, 4,900000, "Private apartment", true, 2,1,user);
-        Property property7 = new Property(address8, 4,1050000, "Private apartment", true, 2,1,user);
-        Property property8 = new Property(address9, 4,1350000, "Private apartment", false, 2,1,user1);
-        Property property9 = new Property(address10, 4,1350000, "Private apartment", false, 2,1,user1);
-        Property[]properties = {property,property1,property2,property3,property4,property5,property6,property7,property8, property9};*/
-
         RealEstate realEstate = new RealEstate();
         Scanner scanner = new Scanner(System.in);
         int option;
@@ -41,13 +21,13 @@ public class Main {
                 printMenu();
                 System.out.println("What do you want to do?:");
                 option = scanner.nextInt();
-            }while (option < 1 || option > 3);
+            }while (option < CREATE_ACCOUNT || option > EXIT);
             switch (option){
-                case 1:{
+                case CREATE_ACCOUNT:{
                     realEstate.createUser();
                     break;
                 }
-                case 2:{
+                case CONNECT_TO_ACCOUNT:{
                     User client;
                     do {
                         client = realEstate.login();
@@ -67,23 +47,23 @@ public class Main {
                             newOption = scanner.nextInt();
                         } while (newOption < 1 || newOption > 6);
                         switch (newOption) {
-                            case 1: {
+                            case POST_NEW_PROPERTY: {
                                 System.out.println(realEstate.postNewProperty(client));
                                 break;
                             }
-                            case 2: {
+                            case REMOVE_PROPERTY: {
                                 realEstate.removeProperty(client);
                                 break;
                             }
-                            case 3: {
+                            case PRINT_ALL_PROPERTIES: {
                                 realEstate.printAllProperties();
                                 break;
                             }
-                            case 4: {
+                            case PRINT_ALL_PROPERTIES_OF_USER: {
                                 realEstate.printAllProperties(client);
                                 break;
                             }
-                            case 5: {
+                            case SEARCH: {
                                 Property[] search = realEstate.search();
                                 if(search != null){
                                     for (int i = 0; i < search.length; i++) {
@@ -94,17 +74,17 @@ public class Main {
                                 }
                                 break;
                             }
-                            case 6: {
+                            case BACK: {
                                 break;
                             }
                         }
-                    }while (newOption != 6);
+                    }while (newOption != BACK);
                 }
-                case 3:{
+                case EXIT:{
                     break;
                 }
             }
-        }while (option != 3);
+        }while (option != EXIT);
 
     }
 
