@@ -21,6 +21,11 @@ public class RealEstate {
     public static final String NULL = null;
     public static final int ADD_TO_LENGTH_ARRAY = 1;
     public static final int ONE = 1;
+    public static final int FOR_RENT = 1;
+    public static final int FOR_SALE = 2;
+    public static final int MIN_PRICE = 0;
+    public static final int MINIMUM_ROOMS = 0;
+
 
     public RealEstate(){
         this.users = new User[INITIALIZE];
@@ -258,10 +263,13 @@ public class RealEstate {
             }while(!isExistIndex(arrayOfIndexes, option));
             for (int i = 0; i < this.properties.length;i++){
                 this.properties[option] = this.properties[this.properties.length - ONE];
+                this.properties[this.properties.length-ONE] = null;
                 Property[] newProperty = new Property[this.properties.length - ONE];
                 if (newProperty.length != INITIALIZE) {
                     for (int j = 0; j < this.properties.length; j++) {
-                        newProperty[j] = this.properties[j];
+                        if(properties[j] != null) {
+                            newProperty[j] = this.properties[j];
+                        }
                     }
                 }
                 this.properties = newProperty;
@@ -292,89 +300,115 @@ public class RealEstate {
         }
     }
 
-    public Property[]search(){
-        Scanner scanner= new Scanner(System.in);
-        if(properties.length != 0) {
-            Property[] newProperty = new Property[properties.length];
-            int indexOfNewProperty = INITIALIZE;
-            boolean is999Rent = false, is999Type = false, is999Rooms = false, is999MinPrice = false, is999MaxPrice = false;
-            boolean forRent;
-            int forRentOrSale;
-            do {
-                System.out.println("Is the apartment for rent? (Press 1 - for rent, Press 2 - for sale, Press -999 to not filter option)");
-                forRentOrSale = scanner.nextInt();
-                if (forRentOrSale == SKIP_OPTION) {
-                    is999Rent = true;
-                    break;
-                }
-            } while (forRentOrSale < 1 || forRentOrSale > 2);
-            if (forRentOrSale == 1) {
-                forRent = true;
-            } else {
-                forRent = false;
-            }
+    public Property[]search() {
+        Scanner scanner = new Scanner(System.in);
+        Property[] searchArray = this.properties;
 
-            int type;
-            String stringType = null;
-            do {
-                System.out.println("What type of property? \n" +
-                        "(Press 1 - for regular floor apartment" + "\n"
-                        + "Press 2 - for penthouse floor apartment" + "\n"
-                        + "Press 3 - for private home" + "\n"
-                        + "Press -999 - to not filter this option)");
-                type = scanner.nextInt();
-                if (type == SKIP_OPTION) {
-                    is999Type = true;
-                    break;
-                }
-            } while (type < 1 || type > 3);
-            if (type == 1) {
-                stringType = REGULAR;
-            } else if (type == 2) {
-                stringType = PENTHOUSE;
-            } else if (type == 3) {
-                stringType = PRIVATE;
-            }
-
-            int rooms;
-            do {
-                System.out.println("How many rooms do you want? (Press -999 - to not filter this option)");
-                rooms = scanner.nextInt();
-                if (rooms == SKIP_OPTION) {
-                    is999Rooms = true;
-                    break;
-                }
-            } while (rooms < 0);
-
-            int minPrice;
-            do {
-                System.out.println("What minimum price do you want? (Press -999 - to not filter this option)");
-                minPrice = scanner.nextInt();
-                if (minPrice == SKIP_OPTION) {
-                    is999MinPrice = true;
-                    break;
-                }
-            } while (minPrice < 0);
-            int maxPrice;
-            do {
-                System.out.println("What maximum price do you want? (Press -999 - to not filter this option)");
-                maxPrice = scanner.nextInt();
-                if (maxPrice == SKIP_OPTION) {
-                    is999MaxPrice = true;
-                    break;
-                }
-            } while (maxPrice < minPrice);
-            for (int i = 0; i < properties.length; i++) {
-                if ((this.properties[i].isForRent() == forRent && !is999Rent) && (this.properties[i].getType().equals(stringType) && !is999Type) && (this.properties[i].getCountOfRoom() == rooms && !is999Rooms) && (this.properties[i].getPrice() > minPrice && !is999MinPrice) && (this.properties[i].getPrice() < maxPrice && !is999MaxPrice)) {
-                    newProperty[indexOfNewProperty] = this.properties[i];
-                    indexOfNewProperty++;
+        int option;
+        do {
+            System.out.println("Is the apartment for rent? (Press 1 - for rent, Press 2 - for sale, Press -999 to not filter option)");
+            option = scanner.nextInt();
+        } while ((option < FOR_RENT || option > FOR_SALE) && option != SKIP_OPTION);
+        if(option == FOR_RENT){
+            for (int i = 0; i < searchArray.length; i++) {
+                if (!searchArray[i].isForRent()) {
+                    searchArray = removeProperty(searchArray, searchArray[i]);
+                    i--;
                 }
             }
-            return newProperty;
-        }else {
-            System.out.println("No exist properties");
-            return null;
         }
+        else if(option == FOR_SALE) {
+            for (int i = 0; i < searchArray.length; i++) {
+                if (searchArray[i].isForRent()) {
+                    searchArray = removeProperty(searchArray, searchArray[i]);
+                    i--;
+                }
+            }
+        }
+        do {
+            System.out.println("What type of property? \n" +
+                    "(Press 1 - for regular floor apartment" + "\n"
+                    + "Press 2 - for penthouse floor apartment" + "\n"
+                    + "Press 3 - for private home" + "\n"
+                    + "Press -999 - to not filter this option)");
+            option = scanner.nextInt();
+        } while ((option < REGULAR_FLOOR_APARTMENT || option > PRIVATE_HOME) && option != SKIP_OPTION);
+        if (option == REGULAR_FLOOR_APARTMENT) {
+            for (int i = 0; i < searchArray.length; i++) {
+                if (!searchArray[i].getType().equals(REGULAR)) {
+                    searchArray = removeProperty(searchArray, searchArray[i]);
+                    i--;
+                }
+            }
+        } else if (option == PENTHOUSE_FLOOR_APARTMENT) {
+            for (int i = 0; i < searchArray.length; i++) {
+                if (!searchArray[i].getType().equals(PENTHOUSE)) {
+                    searchArray = removeProperty(searchArray, searchArray[i]);
+                    i--;
+                }
+            }
+        } else if (option == PRIVATE_HOME) {
+            for (int i = 0; i < searchArray.length; i++) {
+                if (!searchArray[i].getType().equals(PRIVATE)) {
+                    searchArray = removeProperty(searchArray, searchArray[i]);
+                    i--;
+                }
+            }
+        }
+        do {
+            System.out.println("How many rooms do you want? (Press -999 - to not filter this option)");
+            option = scanner.nextInt();
+        } while (option < MINIMUM_ROOMS && option != SKIP_OPTION);
+        if(option != SKIP_OPTION){
+            for (int i = 0; i < searchArray.length;i++){
+                if(option != searchArray[i].getCountOfRoom()){
+                    searchArray = removeProperty(searchArray,searchArray[i]);
+                    i--;
+                }
+            }
+        }
+
+        int minPrice;
+        int maxPrice;
+        do {
+            System.out.println("What minimum price do you want? (Press -999 - to not filter this option)");
+            minPrice = scanner.nextInt();
+            System.out.println("What maximum price do you want? (Press -999 - to not filter this option)");
+            maxPrice = scanner.nextInt();
+        } while (((minPrice < MIN_PRICE || maxPrice < MIN_PRICE) && (maxPrice != SKIP_OPTION && minPrice != SKIP_OPTION)) || ((maxPrice < minPrice) && maxPrice != SKIP_OPTION)) ;
+        if(minPrice != SKIP_OPTION && maxPrice != SKIP_OPTION){
+            for(int i = 0; i < searchArray.length;i++){
+                if(searchArray[i].getPrice() < minPrice || searchArray[i].getPrice() > maxPrice){
+                    searchArray = removeProperty(searchArray,searchArray[i]);
+                    i--;
+                }
+            }
+        }
+        printAllProperties(searchArray);
+
+        return searchArray;
+
+    }
+
+    private void printAllProperties(Property[]Properties){
+        if(properties.length == 0){
+            System.out.println("No exist properties!");
+        }else {
+            for (int i = 0; i < properties.length;i++){
+                System.out.println(i+1 + ".\n" + properties[i]);
+            }
+        }
+    }
+    private Property[] removeProperty(Property[] properties, Property propertyToRemove){
+        Property[] newArray = new Property[this.properties.length-1];
+        int indexToArray =0;
+        for (int i = 0; i < properties.length;i++){
+            if(properties[i] != propertyToRemove){
+                newArray[indexToArray] = properties[i];
+                indexToArray++;
+            }
+        }
+        return newArray;
     }
 
     private void printArray(String[] strings){
